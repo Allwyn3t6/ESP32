@@ -1,0 +1,127 @@
+/*********
+  Rui Santos
+  Complete project details at https://randomnerdtutorials.com  
+*********/
+#ifdef ESP8266
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#elif defined(ESP32)
+#include <WiFi.h>
+#include <ESPmDNS.h>
+#else
+#error "Board not found"
+#endif
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <DFRobot_Geiger.h> //library
+#include <ESPAsyncWebServer.h>
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define detect_pin 25 //pin no2poi09       is connected to the gm counter
+
+int head = 0;
+const char * html = "<p>Temperature: %head% ºC</p><p>Humidity: %head% %</p>";
+ 
+AsyncWebServer server(80);
+ 
+String processor(const String& var)
+{
+ 
+  Serial.println(var);
+ 
+  if(var == "geiger.getCPM"){
+    return String(head);
+  }
+ 
+  //else if(var == "geiger.getnSvh"){
+    //return String(geiger.getnSvh());
+ // }
+ 
+  return String();
+}
+
+
+//char p[32];
+AsyncWebServer server(80); // server port 80
+DFRobot_Geiger  geiger(detect_pin);   //initialize library
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+//static const uint8_t image_data_Saraarray[4096] = {};
+
+void notFound(AsyncWebServerRequest *request)
+{
+  request->send(404, "text/plain", "apdi lam onnum ila, ore oru page than ba");
+}
+
+void setup() {
+  Serial.begin(115200);
+  
+  // Start I2C Communication SDA = 5 and SCL = 4 on Wemos Lolin32 ESP32 with built-in SSD1306 OLED
+  Wire.begin(5, 4);
+
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C, false, false)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  }
+  geiger.start(); // start the gieger
+  delay(2000); // Pause for 2 seconds
+ 
+  // for soft ap
+    WiFi.softAP("esp32", "");
+  Serial.println("softap");
+  Serial.println("");
+  Serial.println(WiFi.softAPIP());
+
+
+  if (MDNS.begin("ESP")) { //esp.local/
+    Serial.println("MDNS responder started");
+  }
+     server.on("/sensor", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", html, processor);
+  });
+
+
+  server.on("/", [](AsyncWebServerRequest * request)
+  { 
+    //String head = head; 
+  request->send(200, "text/plain", "The radiation level is:%u", geiger.getCPM()); //String(geiger.getCPM).c_str(  
+  });
+
+   server.on("/page1", HTTP_GET, [](AsyncWebServerRequest * request)
+  { 
+   String message = "The annual limit for radiation exposure for a member of the public is 1 mSv per annum or 1000 µSv per annum, If you are designated a radiation worker than you can receive up to twenty times this. I.e. 20 mSv per annum."; 
+  request->send(200, "text/plain", message);
+  });
+
+  server.onNotFound(notFound);
+
+  server.begin();  // it will start webserver
+}
+//end
+
+  
+  // Draw bitmap on the screen
+  //display.drawBitmap(0, 0, image_data_Saraarray, 128, 64, 1);
+  
+ 
+void loop() { 
+  Serial.println(geiger.getCPM());
+  //Get the current nSv/h, if it has been paused, nSv/h is the last value before the pause
+  Serial.println(geiger.getnSvh());
+  //Get the current μSv/h, if it has been paused, the μSv/h is the last value before the pause
+  Serial.println(geiger.getuSvh());
+        display.clearDisplay();
+        display.setTextSize(2);
+        display.setTextColor(WHITE);
+        display.setCursor(0, 0);
+        //display.printf("Input from pin 4: %d", pin_value);
+        display.printf("Radiation level detected is: %d",geiger.getCPM());
+        delay(2000); // Pause for 2 seconds
+        display.display();
+        head = geiger.getCPM();
+        //head = map(head,0,1023,0,255);
+       //sprintf(str, "%u", geiger.getCPM);
+       
+}
