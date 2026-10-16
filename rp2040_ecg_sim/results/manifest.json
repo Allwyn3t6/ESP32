@@ -1,0 +1,95 @@
+{
+  "execution_date_utc": "2026-10-16T18:25:00+00:00",
+  "runtime_s": 228.8,
+  "python": "3.13.16",
+  "platform": "Linux-6.18.44-fc-v139-x86_64-with-glibc2.39",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "pandas": "3.0.5",
+  "matplotlib": "3.11.2",
+  "base_seed": 20261016,
+  "seed_scheme": "np.random.SeedSequence([base_seed, trial]).spawn(5) -> streams [ecg, measurement/ADC noise, CPU workload, ADC/DMA hardware, transport]; identical across conditions and architectures (common random numbers)",
+  "trial_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ],
+  "n_trials_per_condition": 30,
+  "duration_s": 600,
+  "fs": 500,
+  "conditions": {
+    "baseline_no_faults": {
+      "usb.stall_rate_hz": 0,
+      "host.stall_rate_hz": 0,
+      "pio.ber": 0
+    },
+    "normal": {},
+    "high_cpu_load": {
+      "cpu.load": 0.75,
+      "cpu.task_mean_s": 0.0015,
+      "cpu.task_sigma": 1.0
+    },
+    "increased_latency": {
+      "host.latency_median_s": 0.015,
+      "host.latency_sigma": 0.8
+    },
+    "reduced_buffer": {
+      "buffers.device_tx_packets": 2,
+      "buffers.receiver_packets": 4,
+      "usb.stall_rate_hz": 0.3,
+      "usb.stall_median_s": 0.05,
+      "host.stall_rate_hz": 0.3,
+      "host.stall_median_s": 0.1
+    },
+    "bursty_delays": {
+      "usb.stall_rate_hz": 0.5,
+      "usb.stall_median_s": 0.08,
+      "usb.stall_sigma": 1.0,
+      "host.stall_rate_hz": 0.3,
+      "host.stall_median_s": 0.15,
+      "host.stall_sigma": 1.0
+    },
+    "packet_loss": {
+      "faults.loss_prob": 0.01,
+      "faults.corrupt_prob": 0.001,
+      "faults.dup_prob": 0.001,
+      "faults.reorder_prob": 0.001,
+      "pio.ber": 1e-06
+    },
+    "receiver_delay": {
+      "host.proc_median_s": 0.06,
+      "host.proc_sigma": 0.7,
+      "host.stall_rate_hz": 0.1,
+      "host.stall_median_s": 0.3
+    }
+  },
+  "quick_mode": false,
+  "data_provenance": "ALL results are simulation outputs; no hardware measurements were made."
+}

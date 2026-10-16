@@ -1,0 +1,3 @@
+main experiment: 720 rows in 185 s
+sensitivity: 690 rows, total 221 s
+done in 229 s -> /home/user/ESP32/rp2040_ecg_sim/results
